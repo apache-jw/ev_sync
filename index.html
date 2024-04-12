@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>California Traffic and Electric Stations Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/esri-leaflet"></script>
+    <style>
+        #map {
+            height: 100vh;  /* Use 100% of the viewport height */
+            width: 100%;
+        }
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <script>
+        var map = L.map('map').setView([36.7783, -119.4179], 6); // Center the map around California
+
+        // Add OpenStreetMap tile layer to the map
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Adding the Bottlenecks layer from Caltrans GIS
+        var bottlenecksLayer = L.esri.featureLayer({
+            url: "https://caltrans-gis.dot.ca.gov/arcgis/rest/services/CHhighway/Bottlenecks/FeatureServer/0",
+            style: function () {
+                return { color: "#ff0000", weight: 2 }; // Style for the Bottlenecks layer, red lines
+            }
+        }).addTo(map);
+
+        // NREL API integration for electric fuel stations
+        const apiKey = 'UDdCNAUAMtLRNze1XTZAShSinKFfGXsxoBdBpSXc'; // Replace 'YOUR_API_KEY' with your actual NREL API key
+        const apiUrl = `https://developer.nrel.gov/api/alt-fuel-stations/v1.json?api_key=${apiKey}&fuel_type=ELEC&state=CA&limit=50`;
+
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                L.geoJSON(data, {
+                    pointToLayer: function (feature, latlng) {
+                        return L.circleMarker(latlng, {
+                            radius: 8,
+                            fillColor: "#0078ff",
+                            color: "#000",
+                            weight: 1,
+                            opacity: 1,
+                            fillOpacity: 0.8
+                        });
+                    },
+                    onEachFeature: function (feature, layer) {
+                        if (feature.properties && feature.properties.station_name) {
+                            layer.bindPopup('Station: ' + feature.properties.station_name);
+                        }
+                    }
+                }).addTo(map);
+            })
+            .catch(err => {
+                console.error('Error loading the NREL data:', err);
+            });
+    </script>
+</body>
+</html>
