@@ -3,20 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive GIS Map</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/esri-leaflet@3.0.2/dist/esri-leaflet.css" />
+    <title>Interactive GIS Map with NREL Widget</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/esri-leaflet/dist/esri-leaflet.css"/>
     <style>
         #map {
             width: 100%;
-            height: 800px; /* You can adjust the height here */
+            height: 50vh; /* Adjusted for demonstration purposes */
+        }
+        #afdc-stations {
+            width: 100%;
+            height: 50vh; /* Adjusted for demonstration purposes */
         }
     </style>
 </head>
 <body>
     <div id="map"></div>
+    <div id="afdc-stations">
+        <div id="afdc-stations-loading">Loading alternative fueling station locator...</div>
+    </div>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/esri-leaflet@3.0.2/dist/esri-leaflet.js"></script>
-    <script src="map.js"></script> 
+    <script src="https://unpkg.com/esri-leaflet"></script>
+    <script src="map.js"></script>
+    <script type="text/javascript">
+        window.afdcStationsOptions = {
+            "country": "all",
+            "localeCountry": "US",
+            "path": "/analyze",
+            "query": {
+                "region": "US-CA",
+                "show_map": "true",
+                "fuel": ["ELEC"],
+                "ev_levels": ["all"],
+                "status": ["E", "P", "T"],
+                "access": ["public", "private"]
+            }
+        };
+    </script>
+    <script async defer src="https://widgets.nrel.gov/afdc/station-locator/assets/embed.js"></script>
+    <noscript>Please enable JavaScript to view the alternative fueling station locator.</noscript>
 </body>
 </html>
